@@ -1,0 +1,54 @@
+//----------------------------------------------------------------------------------------------------------------
+// This class generates the spawn solutions for any power-ups that will affect the player during the game time.  -
+// This is similar to the falling object controller, however it is more time sensitive. It will need to check    -
+// the time between spawns to make sure that is universal and never fails.										 -
+// Nicholas Mallonee																							 -
+// Unreal Engine 4.7.6																							 -
+//----------------------------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------
+// Pragma's and Defines																							 -
+//----------------------------------------------------------------------------------------------------------------
+#pragma once
+
+//----------------------------------------------------------------------------------------------------------------
+// Libraries and Includes																						 -
+//----------------------------------------------------------------------------------------------------------------
+#include "GameFramework/Actor.h"                                      // Accesses the basic actor methods
+#include "PowerUP_Parent.h"                                           // The Classs we are going to spawn with this controller(need to have a path if not in the same folder)
+#include "PowerUp_Controller.generated.h"                             // This class' header fiile(gen by unreal engine)
+
+//----------------------------------------------------------------------------------------------------------------
+// Base Class Header Infromation																				 -
+//----------------------------------------------------------------------------------------------------------------
+UCLASS()
+class CATCH_ME_IF_YOU_CAN_API APowerUp_Controller : public AActor
+{
+	GENERATED_BODY()
+	
+	// -- Public Information -- Constructors and Engine Events -- // 
+public:	
+	APowerUp_Controller();												// Default Constructor  
+
+	APowerUp_Controller(const FObjectInitializer& ObjectInitializer);	// Argumented Constructor 
+
+	virtual void BeginPlay() override;									// Begin play, spawn intstruction
+	
+	virtual void Tick( float DeltaSeconds ) override;					// Frame tick event 
+
+	float generateX(float DeltaSeconds);								// Generate a new X 
+
+	float currentTime;													// Keep the current alive time
+
+	float xCord;														// Holds the new x coord 								
+
+	FTransform ourOldSpawnLocation;										// Hold all of our old spawn information 
+
+	FVector ourLoc;														// Hold our spawn location 
+
+	FRotator ourRotation;												// Hold the rotation of the object 
+
+	UPROPERTY(EditDefaultsOnly, Category = "Our Spawning Object")
+	TSubclassOf<APowerUP_Parent> ourSpawningObject;						// Holds the blue prints of the object we want to spawn 
+		
+};
