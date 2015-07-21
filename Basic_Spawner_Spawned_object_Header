@@ -1,0 +1,37 @@
+//----------------------------------------------------------------------------------------------------------------
+// This class is spawned by the basic spawner class. This is the default actor code from unreal engine, the only -
+// difference is that, in the spawner code, we call this header file to have access to all the methods so that we-
+// can spawn the object.                                                                                         -
+// Nicholas Mallonee                                                                                             -
+// Unreal Engine 4.7.6                                                                                           -
+//----------------------------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------
+// Pragma's and Defines																							 -
+//----------------------------------------------------------------------------------------------------------------
+#pragma once
+
+//----------------------------------------------------------------------------------------------------------------
+// Libraries and Includes																						 -
+//----------------------------------------------------------------------------------------------------------------
+#include "GameFramework/Actor.h"                                          // The class we are inheirting from
+#include "PowerUP_Parent.generated.h"                                     // This class' header file 
+
+UCLASS()
+class CATCH_ME_IF_YOU_CAN_API APowerUP_Parent : public AActor
+{
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	APowerUP_Parent();                                                        // Default Constructor 
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	
+	// Called every frame
+	virtual void Tick( float DeltaSeconds ) override;
+
+	
+	
+};
