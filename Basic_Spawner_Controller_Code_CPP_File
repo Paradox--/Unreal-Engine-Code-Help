@@ -1,0 +1,117 @@
+//---------------------------------------------------------------------------------------------------------------------------------------
+// This class generates the spawn solutions for any power-ups that will affect the player during the game time.							-
+// This is similar to the falling object controller, however it is more time sensitive. It will need to check							-
+// the time between spawns to make sure that is universal and never fails.															    -
+// Nicholas Mallonee																													-
+// Unreal Engine 4.7.6																													-
+//---------------------------------------------------------------------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Libraries and Includes																												-
+//---------------------------------------------------------------------------------------------------------------------------------------
+#include "Catch_Me_If_You_Can.h"													// The Game or app this is in
+#include "PowerUp_Controller.h"														// This classes header file
+#include "Engine.h"																	// Used for debug messages 
+
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Class Constructors																													-
+//---------------------------------------------------------------------------------------------------------------------------------------
+APowerUp_Controller::APowerUp_Controller()											// -- Default Constructor -- // 
+{
+ 	// -- Engine Events for this class -- // 
+	PrimaryActorTick.bCanEverTick = true;
+	this->SetActorTickEnabled(true);
+}
+
+APowerUp_Controller::APowerUp_Controller(const FObjectInitializer& ObjectInitializer) // -- Argumented Constructor -- // 
+	: Super(ObjectInitializer)
+{
+	// -- Allow this actor to call the tick event -- // 
+	PrimaryActorTick.bCanEverTick = true;                   // allow this actor to call the tick method 
+	this->SetActorTickEnabled(true);                        // Force this actor to enable the tick
+
+	currentTime = 0.f;                                      // Set the current time to 0.f seconds, so its not some random number 
+	xCord = 0.f;                                            // set the Xcord we will spawn at to 0.f, so its not some random number
+
+	// Set vector and Rototor to zero 
+	ourRotation.ZeroRotator;                                // Set our rotator to 0: 0 roll, 0 pitch, and 0 yaw
+	ourLoc.X = 0.f;                                         // set our vector to 0 in the x axis(left and right)
+	ourLoc.Y = 100.f;                                       // set our vector to 100 in the y axis(forward and backward)
+	ourLoc.Z = 800.f;                                       // set our vector to 800 in the z axis(up and down)
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Engine Events																														-
+//---------------------------------------------------------------------------------------------------------------------------------------
+void APowerUp_Controller::BeginPlay()												// -- Begin Play Event -- //
+{
+  // overrides the super class(AActor in this case) method, begin play 
+	Super::BeginPlay();
+
+	// Debug message to know the object is alive and in the world
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, TEXT("We are alive"));
+	
+}
+
+void APowerUp_Controller::Tick( float DeltaTime )									// -- Frame Tick Event -- //
+{
+  // overrides the super class(AActor) method, tick 
+	Super::Tick( DeltaTime );
+
+  // take the current time and increment it by 1, and multiply it by the delta time
+	currentTime = currentTime + 1 * DeltaTime; 
+	
+  // debug message to display the current time 
+	FString ourString = FString::SanitizeFloat(currentTime);
+  
+  // printing the debug message to the game world 
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Our Current Time: ") + ourString);
+
+	// if the current time is greater or equal to 2, then do the following...
+	if (currentTime >= 2.f)
+	{
+		// gen a new X 
+		xCord = generateX(DeltaTime); 
+
+		// set the x in the location 
+		ourLoc.X = xCord; 
+
+		// Create Spawn params 
+		FActorSpawnParameters spawnParams;
+		
+		// who did the spawn, and we are say this controller did 
+		spawnParams.Owner = this;
+
+		// Set the instigator to default 
+		spawnParams.Instigator = Instigator;
+
+		// spawn the object now 
+		APowerUP_Parent* ourNewObject = GetWorld()->SpawnActor<APowerUP_Parent>(ourSpawningObject, ourLoc, ourRotation, spawnParams);
+
+		// debug 
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::White, TEXT("We spawned an object"));
+
+		// currentTime back to 0
+		currentTime = 0.f; 
+	}
+}
+
+// This method will generate a new x value to spawn an object into th game world 
+float APowerUp_Controller::generateX(float DeltaSeconds)							// -- Generate a new number -- //
+{
+  // create a variable in memory to pass back a float value for us to use, set it to 0.000000000
+	float passBack = 0.f; 
+
+  // give it a new number, using the FMath class using the Rand Range method 
+  // generates a number between -300 and 300
+	passBack = FMath::RandRange(-300, 300); 
+
+	 // take that number we just generated and add the small number delta seconds is to it
+	passBack = passBack + DeltaSeconds; 
+
+  // Return the newly generated number back to the tick method 
+	return passBack; 
+}
