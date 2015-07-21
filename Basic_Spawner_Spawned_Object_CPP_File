@@ -1,0 +1,42 @@
+//----------------------------------------------------------------------------------------------------------------
+// This class is spawned by the basic spawner class. This is the default actor code from unreal engine, the only -
+// difference is that, in the spawner code, we call this header file to have access to all the methods so that we-
+// can spawn the object.                                                                                         -
+// Nicholas Mallonee                                                                                             -
+// Unreal Engine 4.7.6                                                                                           -
+//----------------------------------------------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------------------------------------------
+//  Libraries and Includes 																		 -
+//----------------------------------------------------------------------------------------------------------------
+#include "Catch_Me_If_You_Can.h"                                   // The game / package that this class is used in
+#include "PowerUP_Parent.h"                                        // This classes header file 
+
+
+
+APowerUP_Parent::APowerUP_Parent()                                  // -- The default constructor -- // 
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+}
+
+void APowerUP_Parent::BeginPlay()                                   // -- Begin Play Event -- // 
+{
+	Super::BeginPlay();
+	
+	// This method is called right when this object is spawned into the world or when the game starts. 
+	// Any methods, variables or anything, will be called as soon as possible!
+	
+}
+
+void APowerUP_Parent::Tick( float DeltaTime )                       // -- Tick Event -- // 
+{
+	Super::Tick( DeltaTime );
+	
+	// This method is the frame tick event!
+	// It is called every single frame!
+	// The Argument it takes a delta time, or a delta second.
+	// Which is a peice of time or a piece of a second. 
+
+}
