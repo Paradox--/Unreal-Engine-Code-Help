@@ -1,0 +1,189 @@
+//----------------------------------------------------------------------------------------------------------------------------------------------
+// This controls the spawning of a proc. forest.		 																					   -
+// This is a simple, simple, simple example of what procedural spawing is. In a normal example, you might generate a seed and use that to      -
+// Determine what path to take(Will do a tutorial on this at a later date).																	   -
+// Please Give Credit for any code used. Thanks,																							   -
+// Nicholas Mallonee																														   -
+// Unreal Engine 4																															   -
+// Version 4.7.6																															   -
+// Date: 4.8.15  -- Day, Month, Year																										   -
+//----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+//----------------------------------------------------------------------------------------------------------------------------------------------
+// Libaries and Includes																													   -
+//----------------------------------------------------------------------------------------------------------------------------------------------
+#include "HardCore.h"																			// The game that this is included in
+#include "Forest_Controller.h"																	// This classes Header file
+
+
+//----------------------------------------------------------------------------------------------------------------------------------------------
+// Constructors and Engine Events																											   -
+//----------------------------------------------------------------------------------------------------------------------------------------------
+AForest_Controller::AForest_Controller()														// -- The Default Constructors -- //
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = false;
+
+
+	// -- Value Sets -- //
+	newX = 0.f;
+	newY = 0.f;
+
+	// -- Array Set-up -- //
+	oldX.SetNum(100);
+	oldY.SetNum(100);
+}
+
+void AForest_Controller::BeginPlay()																// -- The Begin Play Event -- The Driver of this class  -- // 
+{
+	Super::BeginPlay();
+
+
+	// driver function, this will run 100 times on begin play.
+	// starts at 0 and moves to 99 
+	for (int32 i = 0; i < 100; i++)
+	{
+		// generate a x for us to use 
+		newX = generateX(newX);
+
+		// generate a y for use to use
+		newY = generateY(newY); 
+
+		// Add the X to the array at the ith slot
+		oldX[i] = newX;
+
+		// add the Y to the array at the i slot
+		oldY[i] = newY;
+
+		// check if the world exits
+		const UWorld* world = GetWorld();
+
+		// if the world does exist 
+		if (world)
+		{
+			// create spawn params
+			FActorSpawnParameters spawnParams;
+			spawnParams.Owner = this;								// Who spawned this object
+			spawnParams.Instigator = Instigator;					// Who Can do damage to this object
+
+			// Create a vector based on our code
+			FVector newVec;											// Create a new Vector for us to use
+			newVec.Set(newX, newY, 145.f);							// set the locatin to the newX, newY, and 145.f units above the ground
+			
+			// spawn the object 
+			int32 num = FMath::RandRange(0, 2);						// pick a number between 0 and 2( 0 , 1, or 2)
+
+			// flow control to pick an object 
+			if (num == 0)											// if it is 0 
+			{
+				AActor* newActor = GetWorld()->SpawnActor<AProc_Tree>(treeOne, newVec, FRotator::ZeroRotator, spawnParams);
+			}
+			else if (num == 1)										// if it is 1 
+			{
+				AActor* newActor = GetWorld()->SpawnActor<AProc_Tree>(treeTwo, newVec, FRotator::ZeroRotator, spawnParams);
+			}
+			else if (num == 2)										// if it is 2 
+			{
+				AActor* newActor = GetWorld()->SpawnActor<AProc_Tree>(treeThree, newVec, FRotator::ZeroRotator, spawnParams);
+			}
+		}		
+	}
+}
+
+void AForest_Controller::Tick( float DeltaTime )											// -- Frame Tick Event -- // 
+{
+	Super::Tick( DeltaTime );
+
+	// we dont need this since we are not worring about player movement 
+}
+
+//-------------------------------------------------------------------------------------------------------------------------------
+// Spawn Point Gens 																											-
+//-------------------------------------------------------------------------------------------------------------------------------
+float AForest_Controller::generateX(float oldUsedX)											// - Generates a new X coord -- //
+{
+	float passBack = 0.f;																	// init a varaible to the origin
+		
+	passBack = FMath::RandRange(-5000, 5000);												// generate a number between -5000 and 5000 unreal units
+
+	passBack = passBack + oldUsedX;															// set that number to itself plus the old number 
+	
+	if (passBack <  -5000.f || passBack > 5000.f)											// if the number is less that 5000 or greater than 5000 
+	{																						// send a recursive call to create a new one 
+		passBack = generateX(oldUsedX);
+	}
+
+	if (!isUsed(oldX, passBack))															// if the number was used at all, make a recursive call to 
+	{																						// generate a new one for use to use 
+		passBack = generateX(oldUsedX);
+	}
+
+	return passBack;																		// return the result
+}
+
+float AForest_Controller::generateY(float oldUsedY)											// -- Generates a new y coord -- // 
+{
+	float passBack = 0.f;																	// init a variable to the origin 
+
+	passBack = FMath::RandRange(-5000, 5000);												// choose a number between  -5000 and 5000 unreal units
+
+	passBack = passBack + oldUsedY;															// add the old number to that newly generated number
+
+	if (passBack < -5000.f || passBack > 5000.f)											// if that number is less than -5000 or greater than 5000
+	{																						// make a recursive call to try and generate a new number and pass it back 
+		passBack = generateY(oldUsedY);
+	}
+
+	if (!isUsed(oldY, passBack))															// if that number has been used at all 
+	{																						// make a recursive call to try and generate a new Y 
+		passBack = generateY(oldUsedY);
+	}
+
+	return passBack;																		// return the result 
+}
+
+bool AForest_Controller::isUsed(TArray<float> &oldArray, float numCheck)		// -- Checks to see if this was used -- // 
+{
+	bool flag = true;															// Create a flag and set it to it being valid and not used
+
+	for (int32 i = 0; i < oldArray.Num(); i++)									// create a for loop to process the array and cycle through each slot
+	{
+		if (distanceBetween(oldArray[i], numCheck) < 50.f)						// if the array's slot number and the newly generated number are less 
+		{																		// than 50 units apart trip the flag to false
+			flag = false;
+		}		
+	}
+
+	return flag;																// return the result of the test 
+}
+
+float  AForest_Controller::distanceBetween(float inOne, float inTwo)			// -- Checks the distance between points -- // 
+{
+	float passBack = 0.f;														// init a variable to the origin 
+		
+	bool flag = isOneGreater(inOne, inTwo);										// check which number is greater and catch the result 
+
+	if (flag == true)															// if the result was true, that the first number is greater
+	{
+		passBack = inOne - inTwo;												// set the distance between to the first number minus the second
+	}
+	else                                                                        // if the result was false, that the first number was smaller 
+	{
+		passBack = inTwo - inOne;                                               // set the distance between to the second number minus the first 
+	}
+
+	return passBack;															// return the result of the distance between 
+}
+
+bool AForest_Controller::isOneGreater(float inOne, float inTwo)					// -- Checks to see which number is greater -- //
+{
+	bool flag = true;															// assume the first number is greater 
+
+	if (inOne <= inTwo)															// if the first number is less than or equal to the second
+	{
+		flag = false;															// trip the flag to false
+	}
+
+	return flag;																// return the result 
+}
