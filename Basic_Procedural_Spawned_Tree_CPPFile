@@ -1,0 +1,37 @@
+//----------------------------------------------------------------------------------------------------------------------------------------------
+// This is the basic code for the class that is being spawned. Nothing is in here, because its a tree and doesnt need code.					   -
+// Please Give Credit for any code used. Thanks,																							   -
+// Nicholas Mallonee																														   -
+// Unreal Engine 4																															   -
+// Version 4.7.6																															   -
+// Date: 4.8.15  -- Day, Month, Year																										   -
+//----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+//----------------------------------------------------------------------------------------------------------------------------------------------
+//Libraries and includes																													   -
+//----------------------------------------------------------------------------------------------------------------------------------------------
+#include "HardCore.h"														// The Game that this is in 
+#include "Proc_Tree.h"														// This Classes Header file 
+
+//----------------------------------------------------------------------------------------------------------------------------------------------
+// Constructors and Engine Events																											   -
+//----------------------------------------------------------------------------------------------------------------------------------------------
+AProc_Tree::AProc_Tree()													// -- Default Constructor -- //
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+}
+
+void AProc_Tree::BeginPlay()												// -- Begin Play Engine Event -- // 
+{
+	Super::BeginPlay();
+	
+}
+
+void AProc_Tree::Tick( float DeltaTime )									// -- Frame Tick Engine Event -- // 
+{
+	Super::Tick( DeltaTime );
+
+}
