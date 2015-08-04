@@ -1,0 +1,36 @@
+//----------------------------------------------------------------------------------------------------------------------------------------------
+// This is the basic code for the class that is being spawned. Nothing is in here, because its a tree and doesnt need code.					   -
+// Please Give Credit for any code used. Thanks,																							   -
+// Nicholas Mallonee																														   -
+// Unreal Engine 4																															   -
+// Version 4.7.6																															   -
+// Date: 4.8.15  -- Day, Month, Year																										   -
+//----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+//----------------------------------------------------------------------------------------------------------------------------------------------
+// Prama's and Defines																														   -
+//----------------------------------------------------------------------------------------------------------------------------------------------
+#pragma once
+
+//----------------------------------------------------------------------------------------------------------------------------------------------
+// Libaries and Includes																													   -
+//----------------------------------------------------------------------------------------------------------------------------------------------
+#include "GameFramework/Actor.h"															// Include the actor class we are inheirting from 
+#include "Proc_Tree.generated.h"															// Include this classes header file 
+
+UCLASS()
+class HARDCORE_API AProc_Tree : public AActor
+{
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AProc_Tree();
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	
+	// Called every frame
+	virtual void Tick( float DeltaSeconds ) override;	
+};
