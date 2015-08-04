@@ -1,0 +1,76 @@
+//----------------------------------------------------------------------------------------------------------------------------------------------
+// This controls the spawning of a proc. forest.		 																					   -
+// This is a simple, simple, simple example of what procedural spawing is. In a normal example, you might generate a seed and use that to      -
+// Determine what path to take(Will do a tutorial on this at a later date).																	   -
+// Please Give Credit for any code used. Thanks,																							   -
+// Nicholas Mallonee																														   -
+// Unreal Engine 4																															   -
+// Version 4.7.6																															   -
+// Date: 4.8.15  -- Day, Month, Year																										   -
+//----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+//----------------------------------------------------------------------------------------------------------------------------------------------
+// Prama's and Defines																														   -
+//----------------------------------------------------------------------------------------------------------------------------------------------
+#pragma once
+
+//----------------------------------------------------------------------------------------------------------------------------------------------
+// Libraries and Includes																													   - 
+//----------------------------------------------------------------------------------------------------------------------------------------------
+#include "GameFramework/Actor.h"																		// Library we are inheirting
+#include "Proc_tree.h"																					// the object we are going to spawn 
+#include "Forest_Controller.generated.h"																// This classes header file 
+
+
+//----------------------------------------------------------------------------------------------------------------------------------------------
+// Forest Controller Class																													   - 
+//----------------------------------------------------------------------------------------------------------------------------------------------
+UCLASS()
+class HARDCORE_API AForest_Controller : public AActor
+{
+	GENERATED_BODY()
+	
+	// -- Public Information --  Constructors and engine events -- // 
+public:	
+	AForest_Controller();												// The Default Constructor 
+
+	virtual void BeginPlay() override;									// Driver for our proc spawning method 
+		
+	virtual void Tick( float DeltaSeconds ) override;					// Frame Tick event 
+
+	// -- Private Information -- Spawning Methods and Checks -- //
+private:
+	float generateX(float oldUsedX);									// Generates an X coord to use
+
+	float generateY(float oldUsedY);									// Generates a Y coord to use
+
+	bool isUsed(TArray<float> &oldArray, float numCheck);				// Checks if the value has been used before, by testing an array 
+
+	float distanceBetween(float inOne, float inTwo);					// Checks the distance betweem points
+
+	bool isOneGreater(float inOne, float inTwo);						// Checks if one value is greater than another 
+
+	// -- private inforation -- Data types and containers -- // 
+private:
+
+	TArray<float> oldX;													// An Array to Hold all the old Xs
+
+	TArray<float> oldY;													// An Array to Hold all the Old ys 
+
+	float newX;															// holds the new X 
+
+	float newY;															// holds the new Ys
+
+
+	// -- Protected Informatin -- Spawned Objects -- // 
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Possible Object One")
+	TSubclassOf<AProc_Tree> treeOne;									// First Possible object 
+
+	UPROPERTY(EditDefaultsOnly, Category = "Possible Object Two")
+	TSubclassOf<AProc_Tree> treeTwo;									// Second Possible Object
+
+	UPROPERTY(EditDefaultsOnly, Category = "Possible Object Three")
+	TSubclassOf<AProc_Tree> treeThree;									// third Possible Object
+};
