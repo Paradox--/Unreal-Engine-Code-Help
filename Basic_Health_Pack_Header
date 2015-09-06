@@ -1,0 +1,59 @@
+//---------------------------------------------------------------------------------------------------------------------------------------
+// This is a simple health pack that a player can pick up and use. This Object will delete itself once it is deleted. Please give any   -
+// credit for using this code in your project.																							-
+// Nicholas Mallonee																													-
+// Unreal Engine 4.7.6																													-
+// Sept. 6. 2015																														-
+//---------------------------------------------------------------------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Pregmas and Defines																													-
+//---------------------------------------------------------------------------------------------------------------------------------------
+#pragma once
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Libraries and Includes																												-
+//---------------------------------------------------------------------------------------------------------------------------------------
+#include "GameFramework/Actor.h"
+#include "HealthPack.generated.h"
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Class Information																													-
+//---------------------------------------------------------------------------------------------------------------------------------------
+UCLASS()
+class C_PLUS_PLAYGROUND_API AHealthPack : public AActor
+{
+	GENERATED_BODY()
+	
+	// -- Public Information  -- Constructors and Engine Events -- // 
+public:	
+	AHealthPack();																				// Default Constructor
+
+	AHealthPack(const FObjectInitializer& ObjectInitializer);									// Argumented Constructor
+
+	virtual void BeginPlay() override;															// Begin Play Event 
+	
+	virtual void Tick( float DeltaSeconds ) override;											// Frame Tick Event 
+
+	virtual void ReceiveActorBeginOverlap(class AActor* Other) override;						// Engine Event for Overlap events
+
+	void removeFromWorld();																		// Hides and then deletes this actor from the game worl
+
+	// -- Private Information -- Player Handles and Checks  -- // 
+private:
+	bool canBePickedUP(class AC_Plus_PlaygroundCharacter* Other);								// checks if the player is alive and can pick this up
+
+	void handlePickUp(class AC_Plus_PlaygroundCharacter* Other);								// handles giving the player health, or other things
+		
+	void handleEffects();																		// handles the effects or sounds 
+
+
+	// -- Protected Information -- Health Pack's Collision, Health, and particle -- // 
+protected:
+	float health;																				// Holds the amount of health it can give to the player 
+
+	UPROPERTY(EditDefaultsOnly, Category = "Caught Particle")
+	UParticleSystem* ourParticle;																// Holds the particle that will spawn when the player picks this up
+
+	UBoxComponent* collisionComp;																// Holds the bounds in which this object can interact with the player
+};
