@@ -1,0 +1,115 @@
+//---------------------------------------------------------------------------------------------------------------------------------------
+// This is a simple health pack that a player can pick up and use. This Object will delete itself once it is deleted. Please give any   -
+// credit for using this code in your project.																							-
+// Nicholas Mallonee																													-
+// Unreal Engine 4.7.6																													-
+// Sept. 6. 2015																														-
+//---------------------------------------------------------------------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Libraries and Includes																												-
+//---------------------------------------------------------------------------------------------------------------------------------------
+#include "C_Plus_Playground.h"												// Game or project this is included with 
+#include "C_Plus_PlaygroundCharacter.h"										// Players Character that can use this health pack 
+#include "Engine.h"															// Engine header file for debug messages
+#include "HealthPack.h"														// This Classes header file
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Constructors																															-
+//---------------------------------------------------------------------------------------------------------------------------------------
+AHealthPack::AHealthPack()													// -- Default Constructor -- //
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+	// health sets
+	health = 40.f;
+}
+
+AHealthPack::AHealthPack(const FObjectInitializer& ObjectInitializer)		// -- Argumented Constructor -- // 
+{
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+	// health sets
+	health = 40.f;															// health is set to a default value of 40.f
+	
+	// collision set up 
+	collisionComp = ObjectInitializer.CreateDefaultSubobject<UBoxComponent>(this, TEXT("Collision Comp"));	
+	FVector boxSize = FVector(100.f, 100.f, 100.f);							// Create a FVector to set this collisionComps Size
+	collisionComp->SetBoxExtent(boxSize);									// Set the box size using a FVECTOR
+	collisionComp->SetEnableGravity(true);									// Set this box to be effected by gravity
+	collisionComp->SetSimulatePhysics(true);								// Set this box to be effected by basic physics
+	RootComponent = collisionComp;											// Set this box as the root component in the scene root
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Engine Events 																														-
+//---------------------------------------------------------------------------------------------------------------------------------------
+void AHealthPack::BeginPlay()												// -- Begin Play Event -- // 
+{
+	Super::BeginPlay();
+	
+}
+
+void AHealthPack::Tick( float DeltaTime )									// -- Frame Tick Event -- // 
+{
+	Super::Tick( DeltaTime );
+}
+
+void AHealthPack::ReceiveActorBeginOverlap(class AActor* Other)				// -- Overlap Event -- // 
+{
+	if (Other != NULL)														// if the other is NOT null
+	{
+		if (canBePickedUP(Cast<AC_Plus_PlaygroundCharacter>(Other)))        // if the player has health GREATER THAN 0.f
+		{
+			handlePickUp(Cast<AC_Plus_PlaygroundCharacter>(Other));         // Give the player health using an accessor method on the player
+
+			handleEffects();												// handle(play) any effects or sounds
+
+			removeFromWorld();												// hide and then mark this actor for the next deletion cycle
+		}
+	}
+}
+
+void AHealthPack::removeFromWorld()											// -- Remove From World Method -- //
+{
+	RootComponent->GetChildComponent(0)->SetHiddenInGame(true);				// Hide the static mesh of the box
+
+	K2_DestroyActor();														// mark this object to be deleted
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Player Interaction Handling and Checks																								-
+//---------------------------------------------------------------------------------------------------------------------------------------
+bool AHealthPack::canBePickedUP(class AC_Plus_PlaygroundCharacter* Other)	// -- Can Be Picked Up Method -- // 
+{
+	bool flag = false;														// Create a flag and assume that the player can not pick it up
+
+	if (Other != NULL && Other->isAlive())                                  // if the player is not null, and the player has returned they can pick it up
+	{
+		flag = true;                                                        // set the flag to true
+	}
+
+	return flag;                                                            // return the result of the test 
+}
+
+void AHealthPack::handlePickUp(class AC_Plus_PlaygroundCharacter* Other)	// -- Handle Pick Up Method -- // 
+{
+	if (Other != NULL)														// If the player(Other) is not null
+	{
+		// ** DEBUG ** //
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Magenta, TEXT("Players Health has been modified! "));
+
+		Other->addHealth(this->health);                                      // use the accessor method on the player to pass them health from this object
+	}
+}
+
+void AHealthPack::handleEffects()											// -- Handle Effects -- // 
+{
+	FVector ourLoc = this->GetActorLocation();								// Get this actors location in world
+	FRotator ourRot = FRotator::ZeroRotator;								// Create a rotator and set it to (0.f, 0.f, 0.f)
+
+	UGameplayStatics::SpawnEmitterAtLocation(this, ourParticle, ourLoc, ourRot); // spawn a particle at the location 
+}
+
