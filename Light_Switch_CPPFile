@@ -1,0 +1,123 @@
+// This is the cpp file for the simple light switch 
+
+
+
+
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Preagmas and Defines																													-
+//---------------------------------------------------------------------------------------------------------------------------------------
+#include "HauntedHouseSim.h"
+#include "Resources/Player/PlayerCharacter.h"
+#include "Engine.h"
+#include "FuseBox.h"
+
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Constructors																															-
+//---------------------------------------------------------------------------------------------------------------------------------------
+AFuseBox::AFuseBox()																	// -- Default Consturctor -- //
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = false;
+}
+
+AFuseBox::AFuseBox(const FObjectInitializer& ObjectInitializer)							// -- Argumented Constructor -- //
+	: Super(ObjectInitializer)
+{
+	// tick set up 
+	PrimaryActorTick.bCanEverTick = false;
+
+	// mesh set up 
+	ourMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Our Mesh"));
+	ourMesh->SetEnableGravity(false);
+	ourMesh->SetSimulatePhysics(false); 
+	RootComponent = ourMesh; 
+
+	// collision comp set up 
+	collisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("Collision Comp"));
+	collisionComp->SetRelativeLocation(FVector(0.f, 60.f, 0.f));
+	collisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	collisionComp->SetSphereRadius(60.f);
+	collisionComp->AttachParent = RootComponent;
+
+	// light set-up 
+	ourLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Our Light"));
+	ourLight->SetRelativeLocation(FVector(100.f, 150.f, 120.f));
+	ourLight->SetVisibility(true);
+	ourLight->SetCastShadows(true);
+	ourLight->SetIntensity(10000.f);
+	ourLight->SetAttenuationRadius(5000.f);
+	ourLight->AttachParent =  RootComponent;
+
+	// lights current state set
+	bIsOn = true;
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Engine Events																														-
+//---------------------------------------------------------------------------------------------------------------------------------------
+void AFuseBox::BeginPlay()																// -- Begin Play Event -- // 
+{
+	Super::BeginPlay();
+	
+	//setUpBox(); 
+}
+
+void AFuseBox::Tick( float DeltaTime )													// -- Frame Tick Event -- // 
+{
+	Super::Tick( DeltaTime );
+}
+
+void  AFuseBox::ReceiveActorBeginOverlap(class AActor* Other)							// -- Overlap Begin Event -- // 
+{
+	if (Other != NULL)
+	{
+		//if (isPlayer(Cast<APlayerCharacter>(Other)))
+		//{
+		//	ourPlayer = Cast<APlayerCharacter>(Other);
+
+		//	setPlayerNear(true);
+
+		//	// ** DEBUG ** // 
+		//	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Player is in the overlap :: Fuse Box"));
+		//}
+	}
+
+}
+
+void  AFuseBox::ReceiveActorEndOverlap(class AActor* Other)								// -- Overlap End Event -- // 
+{
+	if (Other != NULL)
+	{
+		//if (isPlayer(Cast<APlayerCharacter>(Other)))
+		//{
+		//	ourPlayer = NULL;
+
+		//	setPlayerNear(false);
+
+		//	// ** DEBUG ** // 
+		//	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, TEXT("Player is leaving the overlap :: Fuse box"));
+		//}
+	}
+}
+
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// OutSide Accessors and Mutators																										-
+//---------------------------------------------------------------------------------------------------------------------------------------
+void AFuseBox::toggleLight()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, TEXT("Toggling Fuse Box :: Fuse Box"));
+	
+	if (bIsOn == true)
+	{
+		bIsOn = false;
+		ourLight->SetVisibility(false); 
+	}
+	else
+	{
+		bIsOn = true;
+		ourLight->SetVisibility(true);
+	}
+}
