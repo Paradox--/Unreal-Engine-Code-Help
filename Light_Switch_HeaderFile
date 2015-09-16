@@ -1,0 +1,63 @@
+//---------------------------------------------------------------------------------------------------------------------------------------
+// This is a simple light switch class that a player can turn on and off																													-
+// Nicholas Mallonee																													-
+// Unreal Engine 4.7.6																													-
+//---------------------------------------------------------------------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Preagmas and Defines																													-
+//---------------------------------------------------------------------------------------------------------------------------------------
+#pragma once
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Libraries and Includes																												-
+//---------------------------------------------------------------------------------------------------------------------------------------
+#include "GameFramework/Actor.h"
+#include "FuseBox.generated.h"
+
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Event Declare																														-
+//---------------------------------------------------------------------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+// Class information																													-
+//---------------------------------------------------------------------------------------------------------------------------------------
+UCLASS()
+class HAUNTEDHOUSESIM_API AFuseBox : public AActor
+{
+	GENERATED_BODY()
+	
+	// -- Public Information -- Constructor and engine events -- //
+public:	
+	AFuseBox();																			// Default constuctor 
+
+	AFuseBox(const FObjectInitializer& ObjectInitializer);								// Argumeneted Constructor 
+
+	virtual void BeginPlay() override;													// Begin Play Event 
+
+	virtual void Tick( float DeltaSeconds ) override;									// Frame Tick Event 
+
+	virtual void ReceiveActorBeginOverlap(class AActor* Other) override;				// Being Overlap method 
+
+	virtual void ReceiveActorEndOverlap(class AActor* Other) override;					// End overlap method for collision 
+
+	// -- Private Information -- Mesh, light comp,  and Collision -- // 
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "My Mesh")									// holds the static for our object
+	UStaticMeshComponent* ourMesh;
+
+	USphereComponent* collisionComp; 
+
+												// hold the light we are going to turn on or off
+	UPointLightComponent* ourLight; 
+
+	// -- Private Information -- Switches State -- // 
+private:
+	bool bIsOn;																			// hold if the light is on or off 
+
+	// -- Public Information -- Outside accessors and mutators  -- // 
+public:
+	void toggleLight();																	// allows for a class to toggle the light 
+};
