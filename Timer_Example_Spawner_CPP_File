@@ -1,0 +1,119 @@
+//-------------------------------------------------------------------------------------------------------------------
+// This is a simple timer example. This asset will simply spawn a number of "Orbs" around the origin of the game	-
+// world. Once the selected number of assets is completed it will unbind the timer handle and wait to be removed by -
+// the end play event.	You can freely use this example in your unreal engine projects! Just let me know if you		-
+// have any questioms.																								-
+//																													-
+// Nicholas	Mallonee																								-
+// Unreal Engine 4.7.6 -> 4.10.1																					-
+//-------------------------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------------------------
+// Libraries and Includes																							-
+//-------------------------------------------------------------------------------------------------------------------
+#include "AI_Playground.h"									// The project this asset is in. 
+#include "OrbSpawner.h"										// This classes header file. 
+
+//-----------------------------------------------------------------------------------------------------------------
+// Constructor																									  -
+//-----------------------------------------------------------------------------------------------------------------
+AOrbSpawner::AOrbSpawner()
+{
+ 	PrimaryActorTick.bCanEverTick = false;			// We do not need this actor to tick, since its operations
+													// are handled by the timer we bind in begin play 
+
+	spawnerCount = 3;								// The Default amount of times this actor runs its timer 
+}
+
+//-----------------------------------------------------------------------------------------------------------------
+// Engine Events 																								  -
+//-----------------------------------------------------------------------------------------------------------------
+void AOrbSpawner::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	// Clear any running timer that may be in the world. 
+	// This may cause issues with multiple actors with the same method..
+	GetWorld()->GetTimerManager().ClearTimer(spawnTimerHandler);	
+
+	// You can use this if the one above does cause issues.
+	// This clears any timers for this specific object 
+	//GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+
+
+	// Set the timer to run every 1.25f of a second 
+	// This method binds our spawn time handler to THIS specific 
+	// object, and will call the handle spawn method by reference 
+	// every 1.25 seconds.
+	// The "TRUE" at the end, lets this handle know it needs to call 
+	// the method again. 
+	GetWorld()->GetTimerManager().SetTimer(spawnTimerHandler, this, &AOrbSpawner::handleSpawn, 1.25f, true);
+}
+
+void AOrbSpawner::Tick( float DeltaTime )
+{
+	Super::Tick( DeltaTime );
+
+
+	// WE DONT NEED TO LOAD THIS METHOD SINCE WE ARE  USING A TIMER!
+}
+
+void AOrbSpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	
+	// ** NOTE ** 
+	// DO NOT CLEAR THE TIMER HERE! 
+	// IT WILL CRASH YOUR PROJECT AND YOUR LIFE!!!
+	// IT WILL SHOW A FALSE ERROR!
+	// IT TOOK ME 3 DAYS TO TRACK THIS BUG DOWN ON 
+	// ANOTHER PROJECT!!!!!
+}
+
+//-----------------------------------------------------------------------------------------------------------------
+// Spawning Methods and Timer Handles																			  -
+//-----------------------------------------------------------------------------------------------------------------
+void AOrbSpawner::handleSpawn()											// -- Handles the logic tree -- // 
+{
+	if (spawnerCount > 0)												// If we can still spawn something
+	{																	// spawn the orb / object 
+		spawnOrb();
+	}
+	else                                                                // if we can not spawn somthing 
+	{                                                                   // remove the timer handle from this 
+		cleanUpTimer();                                                 // Object.  
+	}
+}
+
+void AOrbSpawner::spawnOrb()
+{
+	// Make sure the world exists 
+	UWorld* const world = GetWorld();
+
+	// if the world exists try to spawn the object 
+	if (world)
+	{
+		// Generate an X to use for the x and y axis.
+		float x = FMath::RandRange(-270, 270);
+
+		// generate a vector to use. 
+		FVector loc = FVector(x, x, 500.f);
+
+		// set the spawn params 
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+		spawnParams.Instigator = Instigator;
+
+		// Spawn the actor 
+		GetWorld()->SpawnActor<AOrb>(ourOrb, loc, FRotator::ZeroRotator, spawnParams);
+	}
+
+	// reduce the count fo the spawn counter 
+	spawnerCount--; 
+}
+
+void AOrbSpawner::cleanUpTimer()
+{
+	// Clear up this timer on this object 
+	GetWorld()->GetTimerManager().ClearTimer(spawnTimerHandler);
+}
